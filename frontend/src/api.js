@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:8000'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${BACKEND_URL}/api`,
   withCredentials: true,  // send the httponly session_token cookie
 })
 
@@ -21,10 +23,10 @@ api.interceptors.response.use(
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 export const getMe = () =>
-  axios.get('/auth/me', { withCredentials: true }).then((r) => r.data)
+  axios.get(`${BACKEND_URL}/auth/me`, { withCredentials: true }).then((r) => r.data)
 
 export const logout = () =>
-  axios.post('/auth/logout', {}, { withCredentials: true }).then((r) => r.data)
+  axios.post(`${BACKEND_URL}/auth/logout`, {}, { withCredentials: true }).then((r) => r.data)
 
 // ── Transactions ──────────────────────────────────────────────────────────────
 export const getTransactions = (params = {}) =>

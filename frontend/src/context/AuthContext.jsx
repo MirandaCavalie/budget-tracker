@@ -9,7 +9,9 @@ export function AuthProvider({ children }) {
 
   const fetchMe = useCallback(async () => {
     try {
-      setUser(await getMe())
+      const data = await getMe()
+      // Validate it's a real user object, not an HTML error page or empty response
+      setUser(data?.id && data?.email ? data : null)
     } catch {
       setUser(null)
     } finally {

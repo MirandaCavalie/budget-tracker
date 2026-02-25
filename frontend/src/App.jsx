@@ -47,7 +47,7 @@ function UserMenu() {
       {user.picture
         ? <img src={user.picture} alt={user.name} className="w-7 h-7 rounded-full ring-1 ring-slate-700" />
         : <div className="w-7 h-7 rounded-full bg-brand-500/20 flex items-center justify-center text-xs font-bold text-brand-400">
-            {user.name?.[0] ?? user.email[0]}
+            {user.name?.[0] ?? user.email?.[0] ?? '?'}
           </div>
       }
       <span className="text-xs text-slate-400 hidden md:block max-w-[120px] truncate">{user.name || user.email}</span>
