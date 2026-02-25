@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(del \"C:\\\\Users\\\\M.CavalieG\\\\OneDrive - Universidad del Pacífico\\\\Documents\\\\Intercambio\\\\Workshop\\\\Vibecoding\\\\budget-tracker\\\\frontend\\\\src\\\\vite.config.js\")"
+    ]
+  }
+}

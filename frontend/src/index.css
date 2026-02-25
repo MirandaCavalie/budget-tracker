@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-slate-950 text-slate-50;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-50 antialiased;
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-950;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-600;
+  }
+}
+
+@layer components {
+  /* ── Cards ─────────────────────────────────────────────────────── */
+  .card {
+    @apply bg-slate-900 border border-slate-800 rounded-xl;
+  }
+
+  /* ── Buttons ────────────────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-2.5 min-h-[40px]
+           bg-brand-500 hover:bg-brand-400 active:bg-brand-600
+           text-white font-semibold text-sm rounded-lg
+           transition-all duration-150
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-brand-500 focus-visible:ring-offset-2
+           focus-visible:ring-offset-slate-950
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-2.5 min-h-[40px]
+           bg-slate-800 hover:bg-slate-700 active:bg-slate-600
+           text-slate-200 font-medium text-sm
+           border border-slate-700 rounded-lg
+           transition-all duration-150
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-slate-600 focus-visible:ring-offset-2
+           focus-visible:ring-offset-slate-950
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           px-3 py-2 min-h-[36px]
+           text-slate-400 hover:text-slate-200 hover:bg-slate-800
+           font-medium text-sm rounded-lg
+           transition-all duration-150
+           focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-slate-600 focus-visible:ring-offset-2
+           focus-visible:ring-offset-slate-950;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-2.5 min-h-[40px]
+           bg-rose-500/10 hover:bg-rose-500/20
+           text-rose-400 font-medium text-sm
+           border border-rose-500/20 rounded-lg
+           transition-all duration-150;
+  }
+
+  /* ── Inputs ─────────────────────────────────────────────────────── */
+  .input {
+    @apply w-full bg-slate-800 border border-slate-700
+           text-slate-100 placeholder-slate-500
+           rounded-lg px-3 py-2.5 text-sm
+           focus:outline-none focus:ring-2 focus:ring-brand-500
+           focus:border-transparent transition-colors duration-150;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-slate-400
+           mb-1.5 uppercase tracking-wider;
+  }
+
+  /* ── Skeleton ───────────────────────────────────────────────────── */
+  .skeleton {
+    @apply animate-pulse bg-slate-800 rounded;
+  }
+
+  /* ── Badge ──────────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5
+           rounded-full text-xs font-medium;
+  }
+
+  /* ── Tabular numbers for financial figures ──────────────────────── */
+  .nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
