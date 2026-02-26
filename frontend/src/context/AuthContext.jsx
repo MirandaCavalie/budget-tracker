@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { getMe, logout as apiLogout } from '../api'
+import { getMe, logout as apiLogout, setToken } from '../api'
 
 const AuthContext = createContext(null)
 
@@ -19,7 +19,18 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  useEffect(() => { fetchMe() }, [fetchMe])
+  useEffect(() => {
+    // After OAuth redirect, backend passes JWT as ?token= query param
+    const params = new URLSearchParams(window.location.search)
+    const token = params.get('token')
+    if (token) {
+      setToken(token)
+      // Remove token from URL so it doesn't linger in browser history
+      const clean = window.location.pathname + window.location.hash
+      window.history.replaceState({}, '', clean)
+    }
+    fetchMe()
+  }, [fetchMe])
 
   const logout = async () => {
     await apiLogout().catch(() => {})

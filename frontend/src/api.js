@@ -2,9 +2,21 @@ import axios from 'axios'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? 'http://localhost:8000'
 
+// Token helpers — localStorage for prod (cross-domain), cookie fallback for local dev
+export const getToken = () => localStorage.getItem('session_token')
+export const setToken = (t) => localStorage.setItem('session_token', t)
+export const clearToken = () => localStorage.removeItem('session_token')
+
 const api = axios.create({
   baseURL: `${BACKEND_URL}/api`,
-  withCredentials: true,  // send the httponly session_token cookie
+  withCredentials: true,  // still send cookie in local dev
+})
+
+// Attach Bearer token when available (prod cross-domain flow)
+api.interceptors.request.use((config) => {
+  const token = getToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
 })
 
 // Redirect to login on 401
@@ -22,11 +34,18 @@ api.interceptors.response.use(
 )
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-export const getMe = () =>
-  axios.get(`${BACKEND_URL}/auth/me`, { withCredentials: true }).then((r) => r.data)
+const authHeaders = () => {
+  const token = getToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
-export const logout = () =>
-  axios.post(`${BACKEND_URL}/auth/logout`, {}, { withCredentials: true }).then((r) => r.data)
+export const getMe = () =>
+  axios.get(`${BACKEND_URL}/auth/me`, { withCredentials: true, headers: authHeaders() }).then((r) => r.data)
+
+export const logout = () => {
+  clearToken()
+  return axios.post(`${BACKEND_URL}/auth/logout`, {}, { withCredentials: true, headers: authHeaders() }).then((r) => r.data)
+}
 
 // ── Transactions ──────────────────────────────────────────────────────────────
 export const getTransactions = (params = {}) =>

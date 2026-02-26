@@ -4,8 +4,9 @@ Google OAuth2 web flow + JWT session management.
 Flow:
   1. Frontend redirects to GET /auth/login  → server redirects to Google
   2. Google redirects back to GET /auth/callback?code=...
-  3. Server exchanges code for tokens, upserts User, sets httponly JWT cookie
-  4. All /api/* routes call get_current_user() which validates the JWT cookie
+  3. Server exchanges code for tokens, upserts User, redirects to FRONTEND_URL/?token=JWT
+  4. Frontend stores token in localStorage, sends it as Authorization: Bearer on all requests
+  5. All /api/* routes call get_current_user() which validates the JWT from cookie OR Bearer header
 """
 import os
 import logging
@@ -102,13 +103,20 @@ def decode_jwt(token: str) -> int:
 
 # ── Auth dependency — use in every protected route ────────────────────────────
 def get_current_user(
+    request: Request,
     session_token: Optional[str] = Cookie(default=None),
     session: Session = Depends(get_session),
 ) -> User:
-    if not session_token:
+    # Accept token from cookie (local dev) OR Authorization: Bearer header (prod)
+    token = session_token
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+    if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     try:
-        user_id = decode_jwt(session_token)
+        user_id = decode_jwt(token)
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired session")
     user = session.get(User, user_id)
@@ -210,18 +218,9 @@ def callback(
     session.commit()
     session.refresh(user)
 
-    # Issue JWT cookie
+    # Issue JWT — pass via URL query param so cross-domain frontends can store it in localStorage
     token = create_jwt(user.id)
-    redirect = RedirectResponse(url=f"{FRONTEND_URL}/")
-    redirect.set_cookie(
-        key="session_token",
-        value=token,
-        httponly=True,
-        secure=True,          # HTTPS only in prod
-        samesite="lax",
-        max_age=60 * 60 * 24 * JWT_EXPIRE_DAYS,
-        path="/",
-    )
+    redirect = RedirectResponse(url=f"{FRONTEND_URL}/?token={token}")
     return redirect
 
 
