@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
-from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field as PydanticField
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -70,12 +70,10 @@ class SyncRequest(BaseModel):
 
 @app.post("/api/sync")
 def trigger_sync(
-    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     body: SyncRequest = None,
 ):
-    """Manually trigger a sync for the authenticated user."""
+    """Manually trigger a sync for the authenticated user (runs synchronously)."""
     req = body or SyncRequest()
-    background_tasks.add_task(sync_job.run_sync_for_user, current_user, req.days_back)
-    days = req.days_back
-    return {"message": f"Sync started for last {days} day{'s' if days != 1 else ''}"}
+    result = sync_job.run_sync_for_user(current_user, req.days_back)
+    return result

@@ -10,7 +10,9 @@ import {
 
 function CustomTooltip({ active, payload, label, currency, usdToPen }) {
   if (!active || !payload?.length) return null
-  const val = currency === 'PEN' ? payload[0].value * usdToPen : payload[0].value
+  const rawValue = payload?.[0]?.value
+  if (rawValue == null) return null
+  const val = currency === 'PEN' ? rawValue * usdToPen : rawValue
   const formatted = currency === 'PEN'
     ? 'S/ ' + val.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : '$' + val.toFixed(2)
