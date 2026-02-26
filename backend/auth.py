@@ -220,7 +220,7 @@ def callback(
 
     # Issue JWT — pass via URL query param so cross-domain frontends can store it in localStorage
     token = create_jwt(user.id)
-    redirect = RedirectResponse(url=f"{FRONTEND_URL}/?token={token}")
+    redirect = RedirectResponse(url=f"{FRONTEND_URL}/login?token={token}")
     return redirect
 
 
