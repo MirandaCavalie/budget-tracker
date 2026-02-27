@@ -128,20 +128,23 @@ function BottomNav() {
   )
 }
 
-// ─── Protected route wrapper ──────────────────────────────────────────────────
+// ─── Route guards ─────────────────────────────────────────────────────────────
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-slate-500">Loading…</p>
+      </div>
+    </div>
+  )
+}
+
+// Redirects unauthenticated users to /login
 function RequireAuth({ children }) {
   const { user, loading } = useAuth()
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs text-slate-500">Loading…</p>
-        </div>
-      </div>
-    )
-  }
+  if (loading) return <LoadingScreen />
 
   if (!user) return <Navigate to="/login" replace />
 
@@ -156,11 +159,22 @@ function RequireAuth({ children }) {
   )
 }
 
+// Redirects authenticated users away from /login to the dashboard
+function PublicRoute({ children }) {
+  const { user, loading } = useAuth()
+
+  if (loading) return <LoadingScreen />
+
+  if (user) return <Navigate to="/" replace />
+
+  return children
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/" element={
         <RequireAuth><Dashboard /></RequireAuth>
       } />
