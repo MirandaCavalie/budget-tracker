@@ -4,7 +4,7 @@ Google OAuth2 web flow + JWT session management.
 Flow:
   1. Frontend redirects to GET /auth/login  → server redirects to Google
   2. Google redirects back to GET /auth/callback?code=...
-  3. Server exchanges code for tokens, upserts User, redirects to FRONTEND_URL/?token=JWT
+  3. Server exchanges code for tokens, upserts User, redirects to FRONTEND_URL/login?token=JWT
   4. Frontend stores token in localStorage, sends it as Authorization: Bearer on all requests
   5. All /api/* routes call get_current_user() which validates the JWT from cookie OR Bearer header
 """
@@ -220,7 +220,7 @@ def callback(
 
     # Issue JWT — pass via URL query param so cross-domain frontends can store it in localStorage
     token = create_jwt(user.id)
-    redirect = RedirectResponse(url=f"{FRONTEND_URL}/?token={token}")
+    redirect = RedirectResponse(url=f"{FRONTEND_URL}/login?token={token}")
     return redirect
 
 
