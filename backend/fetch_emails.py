@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 _raw_senders = os.getenv(
     "BANK_SENDERS",
     "alertas@bcp.com.pe,notificaciones@interbank.pe,avisos@bbva.pe,"
-    "alertas@scotiabank.com.pe,notificaciones@notificacionesbcp.com.pe",
+    "alertas@scotiabank.com.pe,notificaciones@notificacionesbcp.com.pe,"
+    "servicioalcliente@netinterbank.com.pe,no-reply@operaciones.agora.pe,notificaciones.io.pe"
 )
 BANK_SENDERS: list[str] = [s.strip() for s in _raw_senders.split(",") if s.strip()]
 
