@@ -1,3 +1,8 @@
+# LEGACY — SQLModel table definitions are kept for sync_job.py and auth.py.
+# API routers no longer use these ORM classes for DB operations.
+# Pydantic schemas (TransactionRead, BudgetRead, etc.) are still used by routers
+# for request/response validation.
+# See MIGRATION_NOTES.md for context.
 from datetime import date, datetime
 from typing import Optional
 from sqlmodel import Field, SQLModel, Column

@@ -4,7 +4,8 @@
       "Bash(npm install:*)",
       "Bash(npx playwright install:*)",
       "Bash(del \"C:\\\\Users\\\\M.CavalieG\\\\OneDrive - Universidad del Pacífico\\\\Documents\\\\Intercambio\\\\Workshop\\\\Vibecoding\\\\budget-tracker\\\\frontend\\\\src\\\\vite.config.js\")",
-      "Bash(python3.exe:*)"
+      "Bash(python3.exe:*)",
+      "Bash(find \"C:\\\\Users\\\\Miranda\\\\Documents\\\\Proyectos\\\\budget-tracker\" -type f -name \"*test*\" -o -name \"*tests*\" 2>/dev/null | head -20)"
     ]
   }
 }

@@ -1,3 +1,7 @@
+# LEGACY — used only by sync_job.py and auth.py (OAuth callback + get_current_user).
+# All API routers now use the Supabase client (supabase_client.py) instead.
+# Do not add new usages of get_session() in routers.
+# See MIGRATION_NOTES.md for context.
 import os
 from sqlmodel import SQLModel, create_engine, Session
 from dotenv import load_dotenv

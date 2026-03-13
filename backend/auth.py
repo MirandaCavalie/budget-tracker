@@ -125,6 +125,21 @@ def get_current_user(
     return user
 
 
+# ── Supabase dependency — composable with get_current_user ───────────────────
+def get_current_supabase(
+    current_user: User = Depends(get_current_user),
+):
+    """
+    FastAPI dependency that returns a Supabase client scoped to the current user.
+
+    Sets app.current_user_id in Postgres so RLS policies using
+    current_setting('app.current_user_id')::bigint are enforced automatically.
+    This is Option A of the JWT-compatibility strategy — see MIGRATION_NOTES.md.
+    """
+    from supabase_client import get_supabase_for_user
+    return get_supabase_for_user(current_user.id)
+
+
 # ── Gmail credentials helper (used by sync_job) ───────────────────────────────
 def get_user_gmail_credentials(user: User) -> Optional[Credentials]:
     """Return a valid Credentials object for the user, refreshing if needed."""

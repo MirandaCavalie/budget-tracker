@@ -1,4 +1,19 @@
-"""Per-user sync job: Gmail → Claude extraction → DB."""
+"""
+Per-user sync job: Gmail → Claude extraction → DB.
+
+RLS NOTE: This module runs as a background job and uses a direct SQLAlchemy
+connection via database.engine (service/postgres user), which BYPASSES Row Level
+Security entirely. This is intentional — background jobs run outside the request
+lifecycle and have no user JWT available.
+
+Safety is enforced at the application level: every INSERT and SELECT in this
+module includes an explicit `user_id == user.id` filter. Do not remove these
+filters, as they are the only isolation layer active here.
+
+Long-term path (Option B): When users are synced into Supabase Auth, store a
+short-lived Supabase JWT at sync-trigger time and use get_supabase_for_user()
+here instead of direct SQLAlchemy access.
+"""
 import logging
 from datetime import datetime, date as date_type
 
