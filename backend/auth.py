@@ -81,18 +81,13 @@ def _build_flow(state: Optional[str] = None) -> Flow:
             "redirect_uris": [f"{BACKEND_URL}/auth/callback"],
         }
     }
+    os.environ["OAUTHLIB_NO_PKCE"] = "1"  # disable auto-PKCE in requests-oauthlib >=2.0
     flow = Flow.from_client_config(
         client_config,
         scopes=SCOPES,
         redirect_uri=f"{BACKEND_URL}/auth/callback",
         state=state,
     )
-    # Disable PKCE: requests-oauthlib >=2.0 sets code_challenge_method="S256"
-    # automatically, which embeds a code_challenge in the authorization URL.
-    # The code_verifier lives on the flow object created in /login and is lost
-    # by the time /callback constructs a new flow, causing Google to reject the
-    # token exchange with "invalid_grant: Missing code verifier".
-    flow.oauth2session.code_challenge_method = None
     return flow
 
 
