@@ -189,10 +189,10 @@ def login():
 def callback(
     code: str,
     response: Response,
-    session: Session = Depends(get_session),
 ):
     """Handle Google's redirect, exchange code for tokens, set session cookie."""
     from fastapi.responses import RedirectResponse
+    from supabase_client import get_base_client
 
     try:
         flow = _build_flow()
@@ -204,8 +204,8 @@ def callback(
 
     # Get user profile from Google
     try:
-        service  = build("oauth2", "v2", credentials=creds)
-        profile  = service.userinfo().get().execute()
+        service   = build("oauth2", "v2", credentials=creds)
+        profile   = service.userinfo().get().execute()
         google_id = profile["id"]
         email     = profile["email"]
         name      = profile.get("name", "")
@@ -214,29 +214,31 @@ def callback(
         logger.error("Failed to fetch Google profile: %s", exc)
         return RedirectResponse(url=f"{FRONTEND_URL}?error=profile_failed")
 
-    # Upsert user
-    user = session.exec(select(User).where(User.google_id == google_id)).first()
-    if not user:
-        user = User(google_id=google_id, email=email, name=name, picture=picture)
-        session.add(user)
-        session.flush()  # get user.id
+    supa = get_base_client()
 
-    # Always update tokens (refresh_token may only come on first consent)
+    # Build token fields (refresh_token only arrives on first consent)
+    token_fields: dict = {"name": name, "picture": picture}
     if creds.refresh_token:
-        user.encrypted_refresh_token = encrypt_token(creds.refresh_token)
+        token_fields["encrypted_refresh_token"] = encrypt_token(creds.refresh_token)
     if creds.token:
-        user.encrypted_access_token = encrypt_token(creds.token)
-    user.token_expiry = creds.expiry
-    user.name    = name
-    user.picture = picture
-    session.add(user)
-    session.commit()
-    session.refresh(user)
+        token_fields["encrypted_access_token"] = encrypt_token(creds.token)
+    if creds.expiry:
+        token_fields["token_expiry"] = creds.expiry.isoformat()
+
+    # Upsert user
+    existing = supa.table("user").select("id").eq("google_id", google_id).execute()
+    if existing.data:
+        user_id = existing.data[0]["id"]
+        supa.table("user").update(token_fields).eq("id", user_id).execute()
+    else:
+        result = supa.table("user").insert(
+            {"google_id": google_id, "email": email, **token_fields}
+        ).execute()
+        user_id = result.data[0]["id"]
 
     # Issue JWT — pass via URL query param so cross-domain frontends can store it in localStorage
-    token = create_jwt(user.id)
-    redirect = RedirectResponse(url=f"{FRONTEND_URL}/login?token={token}")
-    return redirect
+    token = create_jwt(user_id)
+    return RedirectResponse(url=f"{FRONTEND_URL}/login?token={token}")
 
 
 @router.post("/logout")
