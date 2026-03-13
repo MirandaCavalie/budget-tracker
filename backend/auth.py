@@ -81,7 +81,6 @@ def _build_flow(state: Optional[str] = None) -> Flow:
             "redirect_uris": [f"{BACKEND_URL}/auth/callback"],
         }
     }
-    os.environ["OAUTHLIB_NO_PKCE"] = "1"  # disable auto-PKCE in requests-oauthlib >=2.0
     flow = Flow.from_client_config(
         client_config,
         scopes=SCOPES,

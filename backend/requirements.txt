@@ -4,7 +4,7 @@ sqlmodel>=0.0.22
 supabase>=2.0.0
 anthropic>=0.40.0
 google-api-python-client>=2.150.0
-google-auth-oauthlib>=1.2.1
+google-auth-oauthlib==1.0.0
 apscheduler>=3.10.4
 beautifulsoup4>=4.12.3
 python-dotenv>=1.0.1
